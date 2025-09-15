@@ -1,6 +1,6 @@
-# QICS: Quantum-Inspired Classical Systems Analysis
+# Quantum-Compatible Approach to Complex System Dynamics
 
-This repository contains Python code for the article on quantum-inspired classical systems analysis. It includes scripts for generating and analyzing data using a modified Lorenz96 model, real-world temperature data, and white noise.
+This repository contains Python code for the article on Quantum-Compatible Approach to Complex System Dynamics. It includes scripts for generating and analyzing data using a modified Lorenz96 model, real-world temperature data, and white noise.
 
 ## Project Structure
 
