@@ -1,0 +1,44 @@
+# Load libraries
+library(tseries)
+library(zoo)
+library(parallel)
+
+# Read data
+data <- scan("~/Desktop/test.txt")
+
+# Define candidate window sizes
+window_sizes <- 12:300
+
+# Function to compute mean ADF p-value for a given window size
+compute_pval <- function(w) {
+  roll_pvals <- rollapply(data, width=w, FUN=function(y) adf.test(y)$p.value,
+                          by=1, fill=NA, align="right")
+  mean(roll_pvals, na.rm=TRUE)
+}
+
+# Detect number of cores
+n_cores <- detectCores() - 1  # leave 1 core free
+
+# Create cluster
+cl <- makeCluster(n_cores)
+
+# Export necessary objects and libraries to cluster
+clusterExport(cl, varlist=c("data"))
+clusterEvalQ(cl, library(zoo))
+clusterEvalQ(cl, library(tseries))
+
+# Compute mean p-values in parallel
+pvals <- parSapply(cl, window_sizes, compute_pval)
+
+# Stop cluster
+stopCluster(cl)
+
+# Plot results
+plot(window_sizes, pvals, type="b", pch=19,
+     xlab="Window size", ylab="Average ADF p-value",
+     main="Rolling ADF p-value vs Window Size")
+abline(h=0.05, col="red", lty=2)
+
+# Find minimal window with average p-value < 0.05
+stationary_window <- window_sizes[which(pvals < 0.05)[1]]
+cat("Estimated stationary window size:", stationary_window, "\n")
